@@ -14,6 +14,6 @@ var removeNthFromEnd = function(head, n) {
         fast = fast.next
         slow = slow.next
     }
-    slow.next = slow.next.next
+    slow.next = slow.next.next // 关键点,删除slow的next，直接指向next的next即可
     return head
 };
