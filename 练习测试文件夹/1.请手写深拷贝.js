@@ -1,8 +1,8 @@
 function isObject(obj) {
-  //return Object.prototype.toString.call(obj) === '[object Object]';
-  return typeof obj === null && obj !== null;
+  return typeof obj === "object" && obj !== null;
 }
 
+// 用来解决循环引用的查找问题
 function find(list, item) {
   for (let i = 0; i < list.length; i++) {
     if (list[i].source === item) {
@@ -13,20 +13,19 @@ function find(list, item) {
   return null;
 }
 
-function cloneDeepDG(source, uniqueList) {
-  if (!isObject(source)) return source;
+function cloneDeepDG(source, uniqueList = []) {
+  if (!isObject) return source;
 
-  // 先确认是否是数组
   let target = Array.isArray(source) ? [] : {};
 
-  let uniqueData = find(uniqueList, source); // 只是为了实现find
+  let uniqueData = find(uniqueList, source);
 
   if (uniqueData) {
     return uniqueData.target;
   }
 
   uniqueList.push({
-    source,
+    source: source,
     target,
   });
 
@@ -43,25 +42,23 @@ function cloneDeepDG(source, uniqueList) {
   return target;
 }
 
-// 破解递归爆栈
-
 function cloneDeepDp(source) {
-  if (!isObject(source)) return source;
+  if (!isObject) return source;
 
-  let target = Array.isArray(source) ? [] : {};
+  let root = Array.isArray(source) ? [] : {};
+
+  let uniqueList = [];
 
   let loopList = [
     {
-      parent: target,
+      parent: root,
       key: undefined,
       data: source,
     },
   ];
 
-  let uniqueList = [];
-
   while (loopList.length) {
-    let node = loopList.pop();
+    const node = loopList.pop();
 
     const { parent, key, data } = node;
 
@@ -70,32 +67,32 @@ function cloneDeepDp(source) {
       res = parent[key] = Array.isArray(parent[key]) ? [] : {};
     }
 
-    let uniqueData = find(uniqueList, parent);
-
-    if (uniqueData) {
+    let uniqueData = find(uniqueList,data);
+    if(uniqueData){
+      // 这里还是错了,要记忆成break,如果return,就终止了,没办法继续往下走了
       parent[key] = uniqueData.target;
       break;
     }
 
     uniqueList.push({
-      source: parent,
+      source: data,
       target: res,
     });
 
-    for (let key in data) {
-      if (data.hasOwnProperty(key)) {
-        if (isObject(data[key])) {
+    for(let k in data){
+      if(data.hasOwnProperty(k)){
+        if(isObject(data[k])){
           loopList.push({
-            parent: res,
-            key: key,
-            data: data[key],
-          });
+            parent:res,
+            key:k,
+            data:data[k]
+          })
         }else{
-          res[key] = data[key]
+          res[k] = data[k]
         }
       }
     }
   }
 
-  return target;
+  return root;
 }

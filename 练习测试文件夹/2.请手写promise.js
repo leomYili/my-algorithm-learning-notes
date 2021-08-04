@@ -1,94 +1,93 @@
-class MyPromise {
-  constructor(excaFn) {
-    this.status = "pending";
-    this.value = undefined;
+class Promise {
+  constructor(exFn) {
+    this.status = "PENDING";
+    this.value = null;
     this.fulfillArray = [];
-    this.rejectArray = [];
+    this.rejectedArray = [];
 
     let resolveFn = (value) => {
-      if (this.status === "pending") return;
+      if (this.status !== "PENDING") return;
       setTimeout(() => {
-        this.status = "fulfilled";
+        this.status = "FULFILLED";
         this.value = value;
         this.fulfillArray.forEach((item) => item(this.value));
       }, 0);
     };
 
     let rejectFn = (reason) => {
-      if (this.status === "pending") return;
+      if (this.status !== "PENDING") return;
+
       setTimeout(() => {
-        this.status = "rejected";
-        this.value = reason;
-        this.fulfillArray.forEach((item) => item(this.value));
+        (this.status = "REJECTED"), (this.value = reason);
+        this.rejectedArray.forEach((item) => item(this.value));
       }, 0);
     };
 
     try {
-      excaFn(resolveFn, rejectFn);
+      exFn(resolveFn, rejectFn);
     } catch (err) {
-      rejectCallback(err);
+      rejectFn(err);
     }
   }
 
   then(fulfillFn, rejectFn) {
-    // 这里首先需要注意默认值
-    typeof fulfillFn !== "function"
-      ? (fulfilledCallBack = (value) => value)
-      : null;
+    // 这里先判断默认值是否存在
+    typeof fulfillFn !== "function" ? (fulfillFn = (item) => item) : null;
     typeof rejectFn !== "function"
       ? (rejectFn = (reason) => {
           throw new Error(reason instanceof Error ? reason.message : reason);
         })
       : null;
 
+    // 解决链式调用的问题
     return new Promise((resolve, reject) => {
-      if (this.status === "pending") {
+      if (this.status === "PENDING") {
         this.fulfillArray.push(() => {
           try {
             let x = fulfillFn(this.value);
-
             x instanceof Promise ? x.then(resolve, reject) : resolve(x);
           } catch (err) {
             reject(err);
           }
         });
-
-        this.rejectArray.push(() => {
+        this.rejectedArray.push(() => {
           try {
             let x = rejectFn(this.value);
-
             x instanceof Promise ? x.then(resolve, reject) : resolve(x);
           } catch (err) {
             reject(err);
           }
         });
-      } else if (this.status === "fulfilled") {
+      } else if (this.status === "FULFILLED") {
         setTimeout(() => {
-          let x = fulfillFn(this.value);
-
-          x instanceof Promise ? x.then(resolve, reject) : resolve(x);
+          try {
+            let x = fulfillFn(this.value);
+            x instanceof Promise ? x.then(resolve, reject) : resolve(x);
+          } catch (err) {
+            reject(err);
+          }
         });
-      } else if (this.status === "rejected") {
+      } else if (this.status === "REJECTED") {
         setTimeout(() => {
-          let x = rejectFn(this.value);
-
-          x instanceof Promise ? x.then(resolve, reject) : resolve(x);
+          try {
+            let x = rejectFn(this.value);
+            x instanceof Promise ? x.then(resolve, reject) : resolve(x);
+          } catch (err) {
+            reject(err);
+          }
         });
       }
     });
   }
 
-  catch(rejectFn) {
-    this.then(null, rejectFn);
+  catch(fn) {
+    return this.then(null, fn);
   }
 
+  // 这里是基础,要先写
+  // 同时value有可能是一个promise
   static resolve(value) {
     if (value instanceof Promise) return value;
-    return new Promise((resolve) => resolve(value));
-  }
-
-  static reject(value) {
-    return new Promise((resolve, reject) => reject(value));
   }
 
   static all(list) {
@@ -96,8 +95,8 @@ class MyPromise {
 
     return new Promise((resolve, reject) => {
       for (let i = 0; i < list.length; i++) {
-        list[i].then((val) => {
-          result[i] = val;
+        list[i].then((value) => {
+          result.push(value);
 
           if (i + 1 === list.length) {
             resolve(result);
@@ -107,17 +106,17 @@ class MyPromise {
     });
   }
 
-  static finally(fn) {
+  static finally(callback) {
     let P = this;
 
-    return this.then(
+    return P.then(
       (value) => {
-        fn();
-        return value;
+        P.resolve(callback()).then(() => value);
       },
       (reason) => {
-        fn();
-        throw reason;
+        P.resolve(callback()).then(() => {
+          throw reason;
+        });
       }
     );
   }
