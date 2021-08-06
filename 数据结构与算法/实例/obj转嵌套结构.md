@@ -161,3 +161,20 @@ function arrayToTree(items) {
 ```
 
 跟上面类似,只是在遍历时直接建立map结构体
+
+## 树级结构转平级结构
+
+可以使用flat相关定义进行转换
+
+```()
+function flatTree({ id, text, children },result = [], pid = "") {
+  result = [{ id, text, pid }]
+  if (Array.isArray(children) && children.length) {
+    children.reduce((result, data) => {
+      result.push(...flatTree(data,result, id))
+      return result
+    }, result)
+  }
+  return result
+}
+```
