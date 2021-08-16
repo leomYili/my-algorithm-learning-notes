@@ -167,14 +167,10 @@ function arrayToTree(items) {
 可以使用flat相关定义进行转换
 
 ```()
-function flatTree({ id, text, children },result = [], pid = "") {
-  result = [{ id, text, pid }]
-  if (Array.isArray(children) && children.length) {
-    children.reduce((result, data) => {
-      result.push(...flatTree(data,result, id))
-      return result
-    }, result)
-  }
-  return result
+export function flatTree(data, pid = 'root') {
+  return data?.reduce(
+    (arr, { key, children = [], ...rest }) => arr.concat([{ key, pid, children, ...rest }], flatTree(children, key)),
+    [],
+  );
 }
 ```

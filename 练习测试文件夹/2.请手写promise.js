@@ -18,7 +18,8 @@ class Promise {
       if (this.status !== "PENDING") return;
 
       setTimeout(() => {
-        (this.status = "REJECTED"), (this.value = reason);
+        this.status = "REJECTED";
+        this.value = reason;
         this.rejectedArray.forEach((item) => item(this.value));
       }, 0);
     };
@@ -88,6 +89,11 @@ class Promise {
   // 同时value有可能是一个promise
   static resolve(value) {
     if (value instanceof Promise) return value;
+    return new Promise((resolve) => resolve(value));
+  }
+
+  static reject(value) {
+    return new Promise((resolve, reject) => reject(value));
   }
 
   static all(list) {
