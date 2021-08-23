@@ -142,7 +142,7 @@ function arrayToTree(items) {
       children: itemMap[id]['children']
     }
 
-    const treeItem =  itemMap[id];
+    const treeItem = itemMap[id];
 
     if (pid === 0) {
       result.push(treeItem);

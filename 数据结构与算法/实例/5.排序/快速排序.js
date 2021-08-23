@@ -95,7 +95,7 @@ var sortArray = function (nums) {
 /**
  *
  */
-var sortArray = function (nums) {
+let sortArray = function (nums) {
   if (nums.length < 2) return nums;
   return quickSort(nums, 0, nums.length - 1);
 };
@@ -152,3 +152,60 @@ var sortArray = function(nums) {
     }
     return sortArray(left).concat(pivotValue,sortArray(right))
 };
+
+/**
+ * 新的分界点计算方法
+ * @param {*} nums 
+ * @returns 
+ */
+let sortArray = (nums) => {
+  // 首先是边界条件,然后是确认边界,开始递归
+  if (nums.length < 2) return nums;
+
+  return quickSort(nums, 0, nums.length - 1);
+};
+
+function quickSort(nums, left, right) {
+  // 这里也需要确认边界,当left>=right时,说明不再需要递归了
+  if (left >= right) return;
+
+  let p = partition(nums, left, right);
+
+  quickSort(nums, left, p - 1);
+  quickSort(nums, p + 1, right);
+
+  return nums;
+}
+
+/**
+ * 重点就是如果获取分界点这里的计算
+ * 这是新的方法,弥补pivot取最后一位的不足
+ * @param {*} nums
+ * @param {*} left
+ * @param {*} right
+ */
+function partition(arr, start, end) {
+  // 防止顺序或者乱序数组
+  if (end > start) {
+    swap(arr, start, start + Math.floor((end - start) / 2));
+  }
+
+  let pivot = arr[start],
+    j = start;
+
+  for (let i = start + 1; i <= end; i++) {
+    if (arr[i] < pivot) {
+      if (++j === i) continue;
+      swap(arr, i, j);
+    }
+  }
+
+  swap(arr, start, j);
+  return j;
+}
+
+function swap(arr, i, j) {
+  let tmp = arr[i];
+  arr[i] = arr[j];
+  arr[j] = tmp;
+}

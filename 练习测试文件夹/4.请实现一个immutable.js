@@ -63,7 +63,6 @@ function produce(target,producer){
     return newState.target
 }
 
-
 let target = {
   name:'tom',
   age:18,
