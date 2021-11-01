@@ -1,4 +1,5 @@
 //广度优先搜索
+// 现在至少知道为什么是先while再for了,实质上是先深度,再每一层逐个搜索,从而实现广度优先
 function BFS(g, s) {
     let queue = []; //辅助队列 Q
     s.color = s.GRAY; //首次发现s涂为灰色
