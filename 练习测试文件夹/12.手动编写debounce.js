@@ -6,9 +6,9 @@
  */
 function debounce(fn, wait = 0, immediate) {
   let timer = null;
-  let self = this;
 
   return (...args) => {
+    let self = this;
     if (timer) clearTimeout(timer);
 
     if (immediate && !timer) {

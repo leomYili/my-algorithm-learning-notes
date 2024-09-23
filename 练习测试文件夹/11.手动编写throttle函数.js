@@ -5,7 +5,6 @@
  * @param {*} wait
  */
 function throttle(fn, wait = 50) {
-  let self = this;
   let prev = 0;
 
   return (...args) => {
@@ -13,7 +12,7 @@ function throttle(fn, wait = 50) {
 
     if (now - prev > wait) {
       prev = now;// 这里需要记忆,否则下次就没办法继续节流了
-      fn.apply(self, args);
+      fn.apply(this, args);
     }
   };
 }

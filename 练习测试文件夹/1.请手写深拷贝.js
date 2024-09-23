@@ -38,6 +38,8 @@ function cloneDeepDG(obj, uniqueList = []) {
       }
     }
   }
+
+  return target;
 }
 
 // 这里和上面基本一致,除了需要依赖一个栈来进行迭代
@@ -62,11 +64,11 @@ function cloneDeepDP(obj) {
     let { parent, key, data } = node;
 
     let res = parent;
-    if (!key) {
+    if (typeof key !== 'undefined') {
       res = parent[key] = Array.isArray(obj) ? [] : {};
     }
 
-    let unique = find(uniqueList, parent);
+    let unique = find(uniqueList, data);
     if (unique) {
       parent[key] = unique.target;
       break;
