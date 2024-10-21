@@ -171,8 +171,6 @@ function quickSort(nums, left, right) {
 
   let p = partition(nums, left, right);
 
-  console.log(nums.slice());
-
   quickSort(nums, left, p - 1);
   quickSort(nums, p + 1, right);
 

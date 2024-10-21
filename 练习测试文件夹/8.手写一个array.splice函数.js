@@ -34,4 +34,4 @@ Array.prototype._splice = function (start, deleteCount, ...rest) {
 
 var sd = [1, 2, 3, 4];
 
-sd._splice(0);
+console.log(sd._splice(0));

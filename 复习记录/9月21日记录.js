@@ -100,7 +100,7 @@ class Promise {
 
     return new Promise((resolve, reject) => {
       for (let i = 0; i < list.length; i++) {
-        list.then((value) => {
+        list[i].then((value) => {
           result.push(value);
 
           if (i + 1 === list.length) {
